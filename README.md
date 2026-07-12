@@ -106,3 +106,44 @@ All related URLs will be automatically derived:
 - ✅ Release build with debug signing (directly installable)
 - ✅ Skips well-known lookup (faster connection to non-standard port servers)
 - ✅ Simplified configuration (single place to change server address)
+
+---
+
+## 自定义服务器配置（中文说明）
+
+本分支已配置为使用自定义 Matrix 主服务器。
+
+### 修改服务器地址
+
+只需修改 **一处** 即可更换服务器地址：
+
+```
+vector-config/src/main/res/values/config.xml
+```
+
+```xml
+<!-- 修改这一行的值为你的服务器地址 -->
+<string name="matrix_org_server_url" translatable="false">https://你的服务器.com:端口</string>
+```
+
+所有相关地址会自动派生：
+
+| 配置项 | 值 |
+|--------|-------|
+| 服务器地址 | `https://你的服务器.com:端口` |
+| 推送网关 | `https://你的服务器.com:端口/_matrix/push/v1/notify` |
+| API 接口 | `https://你的服务器.com:端口/_matrix/client/...` |
+
+### 构建 APK
+
+1. 打开 [Actions](https://github.com/warptr/element-android/actions/workflows/build-apk-new.yml)
+2. 点击 "Run workflow" → "Run workflow"
+3. 等待构建完成
+4. 下载 `element-release-signed` 构建产物
+
+### 此自定义版本特性
+
+- ✅ 无 LeakCanary（不会安装内存泄漏检测应用）
+- ✅ Release 版本使用 Debug 签名（可直接安装）
+- ✅ 跳过 well-known 查找（非标准端口服务器连接更快）
+- ✅ 简化配置（只需修改一处即可更换服务器地址）
