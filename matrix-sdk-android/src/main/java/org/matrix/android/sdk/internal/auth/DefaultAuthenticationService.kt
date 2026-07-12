@@ -165,41 +165,31 @@ internal class DefaultAuthenticationService @Inject constructor(
     private suspend fun getLoginFlowInternal(homeServerConnectionConfig: HomeServerConnectionConfig): LoginFlowResult {
         val authAPI = buildAuthAPI(homeServerConnectionConfig)
 
-        // First check if there is a well-known file
-        return try {
-            getWellknownLoginFlowInternal(homeServerConnectionConfig)
-        } catch (failure: Throwable) {
-            if (failure is Failure.OtherServerError &&
-                    failure.httpCode == HttpsURLConnection.HTTP_NOT_FOUND /* 404 */) {
-                // 404, no well-known data, try direct access to the API
-                // First check the homeserver version
-                return runCatching {
-                    executeRequest(null) {
-                        authAPI.versions()
-                    }
-                }
-                        .map { versions ->
-                            // Ok, it seems that the homeserver url is valid
-                            getLoginFlowResult(authAPI, versions, homeServerConnectionConfig.homeServerUriBase.toString())
-                        }
-                        .fold(
-                                {
-                                    it
-                                },
-                                {
-                                    if (it is Failure.OtherServerError &&
-                                            it.httpCode == HttpsURLConnection.HTTP_NOT_FOUND /* 404 */) {
-                                        // It's maybe a Web client url?
-                                        getWebClientDomainLoginFlowInternal(homeServerConnectionConfig)
-                                    } else {
-                                        throw it
-                                    }
-                                }
-                        )
-            } else {
-                throw failure
+        // Skip well-known lookup and directly access the API
+        // This avoids timeout when server uses non-standard port
+        return runCatching {
+            executeRequest(null) {
+                authAPI.versions()
             }
         }
+                .map { versions ->
+                    // Ok, it seems that the homeserver url is valid
+                    getLoginFlowResult(authAPI, versions, homeServerConnectionConfig.homeServerUriBase.toString())
+                }
+                .fold(
+                        {
+                            it
+                        },
+                        {
+                            if (it is Failure.OtherServerError &&
+                                    it.httpCode == HttpsURLConnection.HTTP_NOT_FOUND /* 404 */) {
+                                // It's maybe a Web client url?
+                                getWebClientDomainLoginFlowInternal(homeServerConnectionConfig)
+                            } else {
+                                throw it
+                            }
+                        }
+                )
     }
 
     private suspend fun getWebClientDomainLoginFlowInternal(homeServerConnectionConfig: HomeServerConnectionConfig): LoginFlowResult {
