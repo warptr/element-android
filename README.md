@@ -65,3 +65,44 @@ This software is dual licensed by New Vector Ltd (Element). It can be used eithe
 (2) under the terms of a paid-for Element Commercial License agreement between you and Element (the terms of which may vary depending on what you and Element have agreed to).
 
 Unless required by applicable law or agreed to in writing, software distributed under the Licenses is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the Licenses for the specific language governing permissions and limitations under the Licenses.
+
+---
+
+## Custom Server Configuration (Custom Build)
+
+This fork is configured to use a custom Matrix homeserver.
+
+### Changing the Server Address
+
+To change the homeserver address, modify **only one line** in:
+
+```
+vector-config/src/main/res/values/config.xml
+```
+
+```xml
+<!-- Change this value to your server address -->
+<string name="matrix_org_server_url" translatable="false">https://your-server.com:port</string>
+```
+
+All related URLs will be automatically derived:
+
+| Config | Value |
+|--------|-------|
+| Server URL | `https://your-server.com:port` |
+| Push Gateway | `https://your-server.com:port/_matrix/push/v1/notify` |
+| API Endpoints | `https://your-server.com:port/_matrix/client/...` |
+
+### Building the APK
+
+1. Go to [Actions](https://github.com/warptr/element-android/actions/workflows/build-apk-new.yml)
+2. Click "Run workflow" → "Run workflow"
+3. Wait for build to complete
+4. Download `element-release-signed` artifact
+
+### Features of This Custom Build
+
+- ✅ No LeakCanary (no debug memory leak detection app)
+- ✅ Release build with debug signing (directly installable)
+- ✅ Skips well-known lookup (faster connection to non-standard port servers)
+- ✅ Simplified configuration (single place to change server address)
