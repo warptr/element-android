@@ -4,6 +4,9 @@
     <!-- "app_name" is now defined in build.gradle -->
 
     <!-- server urls -->
+    <!-- ============================================ -->
+    <!-- 只需修改这一处：服务器地址（域名+端口） -->
+    <!-- ============================================ -->
     <string name="matrix_org_server_url" translatable="false">https://chat.413565.xyz:16666</string>
 
     <!-- Rageshake configuration -->
@@ -16,9 +19,9 @@
         https://matrix.org/docs/spec/client_server/r0.4.0#id128
      -->
 
-    <!-- Note: pusher_http_url should have path '/_matrix/push/v1/notify' -->
+    <!-- Note: pusher_http_url is now auto-generated from matrix_org_server_url -->
     <!-- It is the push gateway for FCM embedded distributor -->
-    <string name="pusher_http_url" translatable="false">https://chat.413565.xyz:16666/_matrix/push/v1/notify</string>
+    <string name="pusher_http_url" translatable="false">auto</string>
     <!-- Note: default_push_gateway_http_url should have path '/_matrix/push/v1/notify' -->
     <!-- It is the push gateway for UnifiedPush -->
     <string name="default_push_gateway_http_url" translatable="false">https://matrix.gateway.unifiedpush.org/_matrix/push/v1/notify</string>

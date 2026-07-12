@@ -42,6 +42,19 @@ class VectorFirebaseMessagingService : FirebaseMessagingService() {
 
     private val scope = CoroutineScope(SupervisorJob())
 
+    /**
+     * Get push gateway URL, auto-generated from matrix_org_server_url if pusher_http_url is "auto"
+     */
+    private fun getPushGatewayUrl(): String {
+        val pusherUrl = getString(im.vector.app.config.R.string.pusher_http_url)
+        return if (pusherUrl == "auto") {
+            val serverUrl = getString(im.vector.app.config.R.string.matrix_org_server_url).trimEnd('/')
+            "$serverUrl/_matrix/push/v1/notify"
+        } else {
+            pusherUrl
+        }
+    }
+
     override fun onDestroy() {
         scope.cancel()
         super.onDestroy()
@@ -60,7 +73,7 @@ class VectorFirebaseMessagingService : FirebaseMessagingService() {
                         pushKey = token,
                         gateway = mdmService.getData(
                                 mdmData = MdmData.DefaultPushGatewayUrl,
-                                defaultValue = getString(im.vector.app.config.R.string.pusher_http_url),
+                                defaultValue = getPushGatewayUrl(),
                         ),
                 )
             }

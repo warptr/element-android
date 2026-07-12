@@ -36,6 +36,19 @@ class UnifiedPushHelper @Inject constructor(
         private val mdmService: MdmService,
 ) {
 
+    /**
+     * Get push gateway URL, auto-generated from matrix_org_server_url if pusher_http_url is "auto"
+     */
+    private fun getPushGatewayUrl(): String {
+        val pusherUrl = stringProvider.getString(im.vector.app.config.R.string.pusher_http_url)
+        return if (pusherUrl == "auto") {
+            val serverUrl = stringProvider.getString(im.vector.app.config.R.string.matrix_org_server_url).trimEnd('/')
+            "$serverUrl/_matrix/push/v1/notify"
+        } else {
+            pusherUrl
+        }
+    }
+
     @MainThread
     fun showSelectDistributorDialog(
             context: Context,
@@ -96,7 +109,7 @@ class UnifiedPushHelper @Inject constructor(
             unifiedPushStore.storePushGateway(
                     gateway = mdmService.getData(
                             mdmData = MdmData.DefaultPushGatewayUrl,
-                            defaultValue = stringProvider.getString(im.vector.app.config.R.string.pusher_http_url),
+                            defaultValue = getPushGatewayUrl(),
                     )
             )
             onDoneRunnable?.run()
@@ -187,7 +200,7 @@ class UnifiedPushHelper @Inject constructor(
         return if (isEmbeddedDistributor()) {
             mdmService.getData(
                     mdmData = MdmData.DefaultPushGatewayUrl,
-                    defaultValue = stringProvider.getString(im.vector.app.config.R.string.pusher_http_url),
+                    defaultValue = getPushGatewayUrl(),
             )
         } else {
             unifiedPushStore.getPushGateway()

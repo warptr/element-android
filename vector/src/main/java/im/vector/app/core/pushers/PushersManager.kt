@@ -31,6 +31,19 @@ class PushersManager @Inject constructor(
         private val getDeviceInfoUseCase: GetDeviceInfoUseCase,
         private val mdmService: MdmService,
 ) {
+
+    /**
+     * Get push gateway URL, auto-generated from matrix_org_server_url if pusher_http_url is "auto"
+     */
+    private fun getPushGatewayUrl(): String {
+        val pusherUrl = stringProvider.getString(im.vector.app.config.R.string.pusher_http_url)
+        return if (pusherUrl == "auto") {
+            val serverUrl = stringProvider.getString(im.vector.app.config.R.string.matrix_org_server_url).trimEnd('/')
+            "$serverUrl/_matrix/push/v1/notify"
+        } else {
+            pusherUrl
+        }
+    }
     suspend fun testPush() {
         val currentSession = activeSessionHolder.getActiveSession()
 
@@ -45,7 +58,7 @@ class PushersManager @Inject constructor(
     suspend fun enqueueRegisterPusherWithFcmKey(pushKey: String): UUID {
         return enqueueRegisterPusher(
                 pushKey = pushKey,
-                gateway = mdmService.getData(MdmData.DefaultPushGatewayUrl, stringProvider.getString(im.vector.app.config.R.string.pusher_http_url))
+                gateway = mdmService.getData(MdmData.DefaultPushGatewayUrl, getPushGatewayUrl())
         )
     }
 
