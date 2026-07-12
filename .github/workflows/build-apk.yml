@@ -9,21 +9,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Java
+      - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Replace Aliyun Maven Mirrors
+        run: |
+          echo "=== Find aliyun mirrors ==="
+          grep -R "maven.aliyun.com" . || true
+
+          find . -type f \( -name "*.gradle" -o -name "*.gradle.kts" -o -name "*.properties" \) \
+            -exec sed -i 's#https://maven.aliyun.com/repository/google#https://dl.google.com/dl/android/maven2#g' {} \;
+
+          find . -type f \( -name "*.gradle" -o -name "*.gradle.kts" -o -name "*.properties" \) \
+            -exec sed -i 's#https://maven.aliyun.com/repository/public#https://repo.maven.apache.org/maven2#g' {} \;
+
+          find . -type f \( -name "*.gradle" -o -name "*.gradle.kts" -o -name "*.properties" \) \
+            -exec sed -i 's#https://maven.aliyun.com/repository/gradle-plugin#https://plugins.gradle.org/m2#g' {} \;
+
+          echo "=== After replace ==="
+          grep -R "maven.aliyun.com" . || true
+
+      - name: Remove old MaxPermSize
+        run: |
+          find . -type f \( -name "*.properties" -o -name "*.gradle" -o -name "*.gradle.kts" \) \
+            -exec sed -i 's/-XX:MaxPermSize=[^ ]*//g' {} \;
+
       - name: Build APK
         run: |
           chmod +x gradlew
-          ./gradlew assembleGplayDebug --no-daemon
+          ./gradlew assembleGplayDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
