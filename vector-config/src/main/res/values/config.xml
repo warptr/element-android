@@ -7,7 +7,7 @@
     <!-- ============================================ -->
     <!-- 只需修改这一处：服务器地址 （域名+端口） -->
     <!-- ============================================ -->
-    <string name="matrix_org_server_url" translatable="false">https://chat.qhnas.dpdns.org:50443</string>
+    <string name="matrix_org_server_url" translatable="false">https://chat.nas.org:50443</string>
 
     <!-- Rageshake configuration -->
     <string name="bug_report_url" translatable="false">https://riot.im/bugreports/submit</string>
